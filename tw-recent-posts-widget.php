@@ -5,7 +5,7 @@ Plugin URI: http://vuckovic.biz/wordpress-plugins/tw-recent-posts-widget
 Description: TW Recent Posts Widget is advanced version of the WordPress Recent Posts widget allowing increased customization to display recent posts from category you define.
 Author: Igor Vučković
 Author URI: http://vuckovic.biz
-Version: 1.0
+Version: 1.0.1
 */
 
 //	Set the wp-content and plugin urls/paths
@@ -21,7 +21,7 @@ if (! defined ( 'WP_PLUGIN_DIR' ))
 class TW_Recent_Posts extends WP_Widget {
 	
 	//	@var string (The plugin version)		
-	var $version = '1.0';
+	var $version = '1.0.1';
 	//	@var string $localizationDomain (Domain used for localization)
 	var $localizationDomain = 'tw-recent-posts';
 	//	@var string $pluginurl (The url to this plugin)
@@ -41,9 +41,8 @@ class TW_Recent_Posts extends WP_Widget {
 		$this->pluginpath = WP_PLUGIN_DIR . "/$name/";
 		add_action ( 'wp_print_styles', array (&$this, 'tw_recent_posts_css' ) );
 		
-		$widget_ops = array ('classname' => 'tw-recent-posts', 'description' => __ ( 'Show Recent Posts from Category', $this->localizationDomain ) );
-		$control_ops = array ('width' => 400, 'height' => 350 );
-		$this->WP_Widget ( 'tw-recent-posts', __ ( 'TW Recent Posts ', $this->localizationDomain ), $widget_ops, $control_ops );
+		$widget_ops = array ('classname' => 'tw-recent-posts', 'description' => __ ( 'Show recent posts from selected category. Includes advanced options.', $this->localizationDomain ) );
+		$this->WP_Widget ( 'tw-recent-posts', __ ( 'TW Recent Posts ', $this->localizationDomain ), $widget_ops );
 	}
 	
 	function tw_recent_posts_css() {
@@ -107,19 +106,19 @@ class TW_Recent_Posts extends WP_Widget {
 	
 	function widget($args, $instance) {
 		extract ( $args );
-		$title = apply_filters ( 'title', $instance ['title'] );
-		$category = apply_filters ( 'category', $instance ['category'] );
-		$moretext = apply_filters ( 'moretext', $instance ['moretext'] );
-		$count = apply_filters ( 'count', $instance ['count'] );
-		$orderby = apply_filters ( 'orderby', $instance ['orderby'] );
-		$order = apply_filters ( 'order', $instance ['order'] );
+		$title = apply_filters ( 'title', isset ( $instance ['title'] ) ? esc_attr ( $instance ['title'] ) : '' );
+		$category = apply_filters ( 'category', isset ( $instance ['category'] ) ? esc_attr ( $instance ['category'] ) : '' );
+		$moretext = apply_filters ( 'moretext', isset ( $instance ['moretext'] ) ? esc_attr ( $instance ['moretext'] ) : '' );
+		$count = apply_filters ( 'count', isset ( $instance ['count'] ) && is_numeric ( $instance ['count'] ) ? esc_attr ( $instance ['count'] ) : '' );
+		$orderby = apply_filters ( 'orderby', isset ( $instance ['orderby'] ) ? $instance ['orderby'] : '' );
+		$order = apply_filters ( 'order', isset ( $instance ['order'] ) ? $instance ['order'] : '' );
 		$width = apply_filters ( 'width', isset ( $instance ['width'] ) && is_numeric ( $instance ['width'] ) ? $instance ['width'] : '60' );
 		$height = apply_filters ( 'height', isset ( $instance ['height'] ) && is_numeric ( $instance ['height'] ) ? $instance ['height'] : '60' );
 		$length = apply_filters ( 'length', isset ( $instance ['length'] ) && is_numeric ( $instance ['length'] ) ? $instance ['length'] : '100' );
-		$show_post_title = apply_filters ( 'show_post_title', isset ( $instance ['show_post_title'] ) ? ( bool ) $instance ['show_post_title'] : ( bool ) $instance ['show_post_title'] );
-		$show_post_thumb = apply_filters ( 'show_post_thumb', isset ( $instance ['show_post_thumb'] ) ? ( bool ) $instance ['show_post_thumb'] : ( bool ) $instance ['show_post_thumb'] );
-		$show_post_excerpt = apply_filters ( 'show_post_excerpt', isset ( $instance ['show_post_excerpt'] ) ? ( bool ) $instance ['show_post_excerpt'] : ( bool ) $instance ['show_post_excerpt'] );
-				
+		$show_post_title = apply_filters ( 'show_post_title', isset ( $instance ['show_post_title'] ) ? ( bool ) $instance ['show_post_title'] : false );
+		$show_post_thumb = apply_filters ( 'show_post_thumb', isset ( $instance ['show_post_thumb'] ) ? ( bool ) $instance ['show_post_thumb'] : ( bool ) false );
+		$show_post_excerpt = apply_filters ( 'show_post_excerpt', isset ( $instance ['show_post_excerpt'] ) ? ( bool ) $instance ['show_post_excerpt'] : false );
+		
 		echo $before_widget;
 		if (! empty ( $title ))
 			echo $before_title . $title . $after_title;
@@ -142,34 +141,39 @@ while ($wp_query->have_posts()) : $wp_query->the_post(); ?>
 	
 	<?php if ($show_post_excerpt) { ?>
 		<div class="excerpt">
-			<?php echo $this->truncate_post($length) . ($moretext != '') ? ' <a href="' . get_permalink() . '" class="read-more">' . $moretext . '</a>' : ''; ?>
+			<?php echo $this->truncate_post($length) . ($moretext != '') ? ' <a href="' . get_permalink () . '" class="read-more">' . $moretext . '</a>' : '';
+				?>
 		</div>
-	<?php } ?>
+	<?php
+			}
+			?>
 		<div class="clear"></div>
 </div>
-<?php endwhile; ?>
+<?php
+		endwhile;
+		?>
 </div>
 <?php
 		echo $after_widget;
-    }
+	}
 	
 	function update($new_instance, $old_instance) {
 		return $new_instance;
 	}
 	
 	function form($instance) {
-		$title = esc_attr ( $instance ['title'] );
-		$category = esc_attr ( $instance ['category'] );
-		$moretext = isset( $instance['moretext'] ) ? esc_attr ( $instance ['moretext'] ) : 'more&raquo;';
-		$count = esc_attr ( $instance ['count'] );
-		$orderby = $instance ['orderby'];
-		$order = $instance ['order'];
-		$width = isset( $instance ['width'] ) && is_numeric($instance ['width']) ? $instance ['width'] : '60';
-		$height = isset( $instance ['height'] ) && is_numeric($instance ['height']) ? $instance ['height'] : '60';
-		$length = isset( $instance ['length'] ) && is_numeric($instance ['length']) ? $instance ['length'] : '100';
-		$show_post_title = isset( $instance['show_post_title'] ) ? (bool) $instance['show_post_title'] : (bool) $instance['show_post_title'];
-		$show_post_thumb = isset( $instance['show_post_thumb'] ) ? (bool) $instance['show_post_thumb'] : (bool) $instance['show_post_thumb'];
-		$show_post_excerpt = isset( $instance['show_post_excerpt'] ) ? (bool) $instance['show_post_excerpt'] : (bool) $instance['show_post_excerpt'];
+		$title = isset ( $instance ['title'] ) ? esc_attr ( $instance ['title'] ) : '';
+		$category = isset ( $instance ['category'] ) ? esc_attr ( $instance ['category'] ) : '';
+		$moretext = isset ( $instance ['moretext'] ) ? esc_attr ( $instance ['moretext'] ) : 'more&raquo;';
+		$count = isset ( $instance ['count'] ) && is_numeric ( $instance ['count'] ) ? esc_attr ( $instance ['count'] ) : '4';
+		$orderby = isset ( $instance ['orderby'] ) ? $instance ['orderby'] : '';
+		$order = isset ( $instance ['order'] ) ? $instance ['order'] : '';
+		$width = isset ( $instance ['width'] ) && is_numeric ( $instance ['width'] ) ? $instance ['width'] : '60';
+		$height = isset ( $instance ['height'] ) && is_numeric ( $instance ['height'] ) ? $instance ['height'] : '60';
+		$length = isset ( $instance ['length'] ) && is_numeric ( $instance ['length'] ) ? $instance ['length'] : '100';
+		$show_post_title = isset ( $instance ['show_post_title'] ) ? ( bool ) $instance ['show_post_title'] : false;
+		$show_post_thumb = isset ( $instance ['show_post_thumb'] ) ? ( bool ) $instance ['show_post_thumb'] : false;
+		$show_post_excerpt = isset ( $instance ['show_post_excerpt'] ) ? ( bool ) $instance ['show_post_excerpt'] : false;
 ?>
 
 <p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', $this->localizationDomain); ?> <input
@@ -228,7 +232,7 @@ while ($wp_query->have_posts()) : $wp_query->the_post(); ?>
 	name="<?php echo $this->get_field_name('show_post_thumb'); ?>"
 	type="checkbox" <?php checked($show_post_thumb); ?> /> <label
 	for="<?php echo $this->get_field_id('show_post_thumb'); ?>"><?php _e('Show post thumb:', $this->localizationDomain); ?></label><br />
-<small><?php _e('Thumbnail size (width and height):', $this->localizationDomain); ?></small>
+<small><?php _e('Thumbnail size (W-H):', $this->localizationDomain); ?></small>
 <input type="text" size="3"
 	name="<?php echo $this->get_field_name('width'); ?>"
 	value="<?php echo $width; ?>" />px <input type="text" size="3"
@@ -242,7 +246,8 @@ while ($wp_query->have_posts()) : $wp_query->the_post(); ?>
 <small><?php _e('Post excerpt length (characters)', $this->localizationDomain); ?></small>
 <input id="<?php echo $this->get_field_id('length'); ?>"
 	name="<?php echo $this->get_field_name('length'); ?>" type="text"
-	size="3" value="<?php echo $length; ?>" /> <small><?php _e('Read more text', $this->localizationDomain); ?></small>
+	size="3" value="<?php echo $length; ?>" /><br />
+<small><?php _e('Read more text', $this->localizationDomain); ?></small>
 <input name="<?php echo $this->get_field_name('moretext'); ?>"
 	type="text" size="12" value="<?php echo $moretext; ?>" /></p>
 
