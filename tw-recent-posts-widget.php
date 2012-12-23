@@ -5,7 +5,7 @@ Plugin URI: http://vuckovic.biz/wordpress-plugins/tw-recent-posts-widget
 Description: TW Recent Posts Widget is advanced version of the WordPress Recent Posts widget allowing increased customization to display recent posts from category you define.
 Author: Igor Vučković
 Author URI: http://vuckovic.biz
-Version: 1.0.1
+Version: 1.0.2
 */
 
 //	Set the wp-content and plugin urls/paths
@@ -21,7 +21,7 @@ if (! defined ( 'WP_PLUGIN_DIR' ))
 class TW_Recent_Posts extends WP_Widget {
 	
 	//	@var string (The plugin version)		
-	var $version = '1.0.1';
+	var $version = '1.0.2';
 	//	@var string $localizationDomain (Domain used for localization)
 	var $localizationDomain = 'tw-recent-posts';
 	//	@var string $pluginurl (The url to this plugin)
@@ -148,9 +148,11 @@ while ($wp_query->have_posts()) : $wp_query->the_post(); ?>
 			}
 			?>
 		<div class="clear"></div>
-</div>
+	</div>
 <?php
-		endwhile;
+endwhile;
+wp_reset_query();
+wp_reset_postdata();
 		?>
 </div>
 <?php
