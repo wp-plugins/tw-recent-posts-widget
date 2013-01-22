@@ -4,7 +4,7 @@ Plugin URI: http://vuckovic.biz/wordpress-plugins/tw-recent-posts-widget
 Description: A simple and flexible widget for WordPress which will show recent posts from selected category.
 Author: Igor Vučković
 Author URI: http://vuckovic.biz
-Version: 1.0
+Version: 1.3
 */
 
 /* R E C E N T   P O S T S
@@ -27,6 +27,14 @@ Version: 1.0
 
 .tw-recent-posts .featured-post h4 a {
 	font-size: 100%
+}
+
+.tw-recent-posts .post-time {
+	font-size: 0.8em;
+	font-style: italic;
+	text-align: right;
+	margin: 0 0 5px 0;
+	padding: 0;
 }
 
 .tw-recent-posts .featured-post img {
