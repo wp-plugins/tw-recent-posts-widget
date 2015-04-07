@@ -183,7 +183,8 @@ while($wp_query->have_posts()) : $wp_query->the_post(); ?>
 
 	<?php if($show_post_excerpt) { ?>
 		<div class="excerpt">
-			<?php echo $this->_truncate_post($length) .($moretext != '') ? ' <a href="' . get_permalink() . '" class="read-more">' . $moretext . '</a>' : ''; ?>
+            <?php echo $this->_truncate_post($length)
+                . ($moretext != '' ? ' <a href="' . get_permalink() . '" class="read-more">' . $moretext . '</a>' : ''); ?>
 		</div>
 	<?php } ?>
 
